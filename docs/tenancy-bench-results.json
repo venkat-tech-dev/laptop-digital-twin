@@ -1,0 +1,164 @@
+{
+  "generated_at": "2026-10-09T04:54:44.242923+00:00",
+  "mode": "in-process, memory repositories",
+  "authorization_overhead": {
+    "auth_none": {
+      "p50_ms": 13.05,
+      "p95_ms": 22.89,
+      "mean_ms": 13.96
+    },
+    "accounts_with_tenancy": {
+      "p50_ms": 11.41,
+      "p95_ms": 22.83,
+      "mean_ms": 15.42
+    },
+    "overhead_p50_ms": -1.64
+  },
+  "scale": [
+    {
+      "tenants": 1,
+      "devices_total": 5,
+      "setup_s": 1.61,
+      "org_fleet_list": {
+        "p50_ms": 12.54,
+        "p95_ms": 28.34,
+        "mean_ms": 14.92
+      },
+      "twin_read_own": {
+        "p50_ms": 12.56,
+        "p95_ms": 25.51,
+        "mean_ms": 14.53
+      },
+      "cross_tenant_probe_404": null,
+      "telemetry_ingest": {
+        "p50_ms": 18.78,
+        "p95_ms": 38.11,
+        "mean_ms": 21.25
+      }
+    },
+    {
+      "tenants": 10,
+      "devices_total": 50,
+      "setup_s": 10.85,
+      "org_fleet_list": {
+        "p50_ms": 16.84,
+        "p95_ms": 27.19,
+        "mean_ms": 18.69
+      },
+      "twin_read_own": {
+        "p50_ms": 10.51,
+        "p95_ms": 20.2,
+        "mean_ms": 11.64
+      },
+      "cross_tenant_probe_404": {
+        "p50_ms": 10.51,
+        "p95_ms": 17.45,
+        "mean_ms": 11.68
+      },
+      "telemetry_ingest": {
+        "p50_ms": 14.63,
+        "p95_ms": 27.49,
+        "mean_ms": 16.38
+      }
+    },
+    {
+      "tenants": 50,
+      "devices_total": 250,
+      "setup_s": 53.41,
+      "org_fleet_list": {
+        "p50_ms": 21.38,
+        "p95_ms": 67.03,
+        "mean_ms": 25.3
+      },
+      "twin_read_own": {
+        "p50_ms": 18.25,
+        "p95_ms": 31.05,
+        "mean_ms": 22.72
+      },
+      "cross_tenant_probe_404": {
+        "p50_ms": 14.31,
+        "p95_ms": 43.0,
+        "mean_ms": 17.57
+      },
+      "telemetry_ingest": {
+        "p50_ms": 21.33,
+        "p95_ms": 37.45,
+        "mean_ms": 22.42
+      }
+    },
+    {
+      "tenants": 100,
+      "devices_total": 500,
+      "setup_s": 94.89,
+      "org_fleet_list": {
+        "p50_ms": 7.89,
+        "p95_ms": 12.94,
+        "mean_ms": 8.25
+      },
+      "twin_read_own": {
+        "p50_ms": 6.89,
+        "p95_ms": 15.02,
+        "mean_ms": 7.72
+      },
+      "cross_tenant_probe_404": {
+        "p50_ms": 6.7,
+        "p95_ms": 12.13,
+        "mean_ms": 6.97
+      },
+      "telemetry_ingest": {
+        "p50_ms": 10.23,
+        "p95_ms": 16.87,
+        "mean_ms": 10.21
+      }
+    },
+    {
+      "tenants": 200,
+      "devices_total": 1000,
+      "setup_s": 87.86,
+      "org_fleet_list": {
+        "p50_ms": 7.81,
+        "p95_ms": 13.37,
+        "mean_ms": 8.22
+      },
+      "twin_read_own": {
+        "p50_ms": 6.17,
+        "p95_ms": 9.87,
+        "mean_ms": 6.31
+      },
+      "cross_tenant_probe_404": {
+        "p50_ms": 6.27,
+        "p95_ms": 12.54,
+        "mean_ms": 12.46
+      },
+      "telemetry_ingest": {
+        "p50_ms": 8.59,
+        "p95_ms": 16.62,
+        "mean_ms": 9.29
+      }
+    }
+  ],
+  "noisy_neighbour": {
+    "tenant_a_quota_per_min": 60,
+    "tenant_a_requests": 615,
+    "tenant_a_accepted": 54,
+    "tenant_a_throttled_429": 561,
+    "tenant_b_baseline": {
+      "rounds": 528,
+      "p50_ms": 14.79,
+      "p95_ms": 22.8,
+      "non_2xx": 0
+    },
+    "tenant_b_during_flood": {
+      "rounds": 55,
+      "p50_ms": 104.62,
+      "p95_ms": 295.04,
+      "non_2xx": 0
+    }
+  },
+  "interpretation": {
+    "authorization_overhead": "Within measurement noise: the accounts + tenancy path was not slower than AUTH_MODE=none at p50 (difference -1.6 ms). Per-request tenancy work (membership lookup, visible-device set, device check) is not visible next to HTTP handling.",
+    "scale": "No growth with tenant count: p50 of fleet list, own-device read, cross-tenant probe and ingest stayed within ~6-21 ms from 1 to 200 organizations (1000 devices). Variation between runs (50 tenants slowest) is host load on a shared laptop, not tenancy cost.",
+    "noisy_neighbour": "Tenant A (quota 60 batches/min, THROTTLE) sent 615 batches from 6 threads in 8 s: 54 accepted, 561 answered 429 with Retry-After. Tenant B was never throttled and had 0 errors. B's latency rose during the flood because the in-process test client serialises every request through one event loop; it is queueing behind A's (cheap, rejected) requests in this single process, not quota leakage.",
+    "limits": "In-process memory repositories; database, network and multi-replica effects are not included. Quota windows are per process (see threat model RR2)."
+  }
+}

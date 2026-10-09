@@ -1,0 +1,18 @@
+{
+  "source": "scripts/remediation_bench.py (in-process engine, memory repository, real Ed25519 signing, simulated agents) and --sql against the isolated ldt_load database; laptop i5-1335U, 2026-10-08",
+  "fleet_limit": 20,
+  "in_process": [
+    {"devices": 100, "proposals": 100, "duplicates_suppressed": 50, "propose_per_s": 6107, "approve_per_s": 1725, "succeeded": 100, "tick_ms_p50": 6.3, "tick_ms_max": 28.3, "max_in_flight": 20},
+    {"devices": 1000, "proposals": 1000, "duplicates_suppressed": 500, "propose_per_s": 6017, "approve_per_s": 3550, "succeeded": 1000, "tick_ms_p50": 8.1, "tick_ms_max": 50.5, "max_in_flight": 20},
+    {"devices": 10000, "proposals": 10000, "duplicates_suppressed": 5000, "propose_per_s": 3619, "approve_per_s": 3696, "succeeded": 10000, "tick_ms_p50": 17.7, "tick_ms_max": 609.0, "max_in_flight": 20, "peak_python_mb": 236.8}
+  ],
+  "before_indexing_1000_devices": {"tick_ms_p50": 961.4, "tick_ms_max": 2760.9, "note": "fleet-wide scans per precondition (quadratic); fixed with per-device indexes, a per-tick in-flight count and capacity-first dispatch"},
+  "postgresql_isolated": {"devices": 500, "propose_per_s": 18, "approve_per_s": 22, "audit_chain_ok": true, "note": "one transaction per decision (upsert + advisory lock + chain head + audit rows); Docker-for-Windows round trips and ~14 ms commits dominate"},
+  "real_agent_end_to_end": {
+    "REFRESH_TELEMETRY": "SUCCEEDED (agent completed + fresh telemetry)",
+    "REQUEST_SYSTEM_RESCAN": "SUCCEEDED",
+    "RESTART_KNOWN_APPLICATION dry run": "SUCCEEDED (nothing changed)",
+    "RESTART_KNOWN_APPLICATION (charmap.exe test target)": "SUCCEEDED after a backend restart mid-flight: pid 14008 closed via WM_CLOSE, relaunched as pid 32212; all four verification checks passed",
+    "device refusal": "first restart attempt refused by the agent (application not running in the session) -> FAILED, nothing executed"
+  }
+}

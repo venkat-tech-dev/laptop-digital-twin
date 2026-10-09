@@ -1,0 +1,22 @@
+{
+  "diagnoses": 2000,
+  "rules_pipeline_ms": {
+    "p50": 0.75,
+    "p95": 2.01,
+    "max": 4.29
+  },
+  "validation_ms": {
+    "p50": 0.167,
+    "p95": 0.492
+  },
+  "throughput_per_s_one_core": 1067,
+  "prompt_chars": {
+    "p50": 6419,
+    "max": 9229
+  },
+  "prompt_tokens_approx": {
+    "p50": 1604,
+    "max": 2307
+  },
+  "peak_python_memory_mb_per_200": 0.1
+}

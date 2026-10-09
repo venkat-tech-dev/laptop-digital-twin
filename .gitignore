@@ -1,0 +1,47 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+coverage/
+
+# editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# local data
+*.log
+models/**/*.glb
+models/**/*.gltf
+!models/README.md
+
+.env.bak*
+
+# local tool state, data and backups (Phase 10)
+.claude/
+backups/
+*.dump
+*.sqlite
+*.db
+credentials.bin
+action_key.json
+dist/
+build/

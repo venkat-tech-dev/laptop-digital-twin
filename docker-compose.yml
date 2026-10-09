@@ -1,0 +1,93 @@
+# Laptop Digital Twin - backend infrastructure.
+#
+# IMPORTANT: the Windows telemetry agent runs on the HOST (python -m app.main in ./agent), not in
+# Docker: containers cannot read the host's performance counters, WMI, ACPI or battery driver.
+#
+#   docker compose up -d postgres redis            # infra only (run backend/frontend natively)
+#   docker compose up -d --build                    # full stack: postgres, redis, backend, frontend
+#
+# All ports are published on 127.0.0.1 only, so nothing is reachable from your network.
+
+name: laptop-digital-twin
+
+services:
+  postgres:
+    image: timescale/timescaledb:2.17.2-pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ldt}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-ldt}
+      TIMESCALEDB_TELEMETRY: "off"
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-15432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ldt} -d ${POSTGRES_DB:-ldt}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "128mb",
+              "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "127.0.0.1:${REDIS_HOST_PORT:-16379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../infrastructure/docker/backend.Dockerfile
+    restart: unless-stopped
+    stop_grace_period: 30s  # graceful shutdown flushes buffered samples, events and ingest receipts
+    # Phase 9 hardening: no privilege escalation, no Linux capabilities (non-root, port 8000), bounded memory
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    mem_limit: 1g
+    pids_limit: 256
+    env_file: .env
+    environment:
+      API_HOST: 0.0.0.0
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-ldt}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-ldt}
+      REDIS_URL: redis://redis:6379/0
+      MODELS_DIR: /models
+    volumes:
+      - ./models:/models  # writable: administrators can upload a model / photo from the UI
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../infrastructure/docker/frontend.Dockerfile
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]  # nginx-unprivileged listens on 8080 as a non-root user
+    mem_limit: 128m
+    pids_limit: 64
+    ports:
+      - "127.0.0.1:${FRONTEND_HOST_PORT:-8088}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -1,0 +1,28 @@
+/* Design tokens extracted from the Figma file "Laptop Digital Twin" (frames 2:18309 … 2:20600). */
+:root {
+  --bg: #101317;
+  --nav: #0c0f13;
+  --panel: #161b21;
+  --viewport: #0d1116;
+  --control: #1c222a;
+  --border: #2b333e;
+
+  --accent: #69cfe5;
+  --accent-bg: #16313c;
+  --secondary: #7c9cd6;
+  --amber: #d9ad6c;
+  --amber-bg: #30291f;
+  --critical: #e5736a;
+  --critical-bg: #3a2222;
+
+  --text: #e9edf2;
+  --text-2: #a1acb9;
+  --muted: #6e7c8d;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --r-control: 4px;
+  --r-panel: 6px;
+  --nav-w: 224px;
+}

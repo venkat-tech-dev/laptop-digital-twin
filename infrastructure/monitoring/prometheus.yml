@@ -1,0 +1,11 @@
+# Example Prometheus scrape config for the backend's /metrics endpoint.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 30s
+rule_files:
+  - slo-rules.yml   # Phase 10: SLO recording rules and burn-rate alerts
+scrape_configs:
+  - job_name: ldt-backend
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['backend:8000']   # or 127.0.0.1:8000 when Prometheus runs on the host

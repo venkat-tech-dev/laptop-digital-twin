@@ -1,0 +1,22 @@
+{
+ "off": {
+  "backend_cpu_avg_pct": 0.0,
+  "end_to_end_p50_ms": 64.9,
+  "end_to_end_p95_ms": 341.3,
+  "http_p95_ms": 436.6,
+  "db_samples_insert_avg_ms": 933.8,
+  "persist_queue_max": 32944,
+  "persist_dropped": 0,
+  "errors": 0
+ },
+ "on": {
+  "backend_cpu_avg_pct": 0.0,
+  "end_to_end_p50_ms": 72.9,
+  "end_to_end_p95_ms": 332.1,
+  "http_p95_ms": 492.1,
+  "db_samples_insert_avg_ms": 964.4,
+  "persist_queue_max": 31204,
+  "persist_dropped": 0,
+  "errors": 0
+ }
+}

@@ -1,0 +1,536 @@
+{
+ "generated_at": "2026-10-07T16:43:23.165558+00:00",
+ "policy": {
+  "eval_interval_s": 10.0,
+  "observation_window_s": 120.0,
+  "min_window_coverage": 0.5,
+  "baseline_history_days": 7.0,
+  "training_bucket_s": 60,
+  "retrain_interval_s": 3600.0,
+  "cold_min_samples": 60,
+  "stable_min_span_days": 7.0,
+  "stable_min_samples": 2880,
+  "min_context_samples": 120,
+  "degraded_excluded_fraction": 0.3,
+  "contamination_min_confidence": 0.7,
+  "z_trigger": 3.5,
+  "z_recover": 2.0,
+  "z_trigger_cold": 5.0,
+  "quantile_trigger": "p99",
+  "quantile_recover": "p95",
+  "persistence_s": 180.0,
+  "recovery_s": 120.0,
+  "cooldown_s": 900.0,
+  "ewma_alpha": 0.3,
+  "shift_z": 3.0,
+  "volatility_ratio": 3.0,
+  "iforest_enabled": true,
+  "iforest_trees": 64,
+  "iforest_sample_size": 128,
+  "iforest_min_train_samples": 720,
+  "iforest_threshold_quantile": 0.995,
+  "iforest_seed": 7,
+  "iforest_margin": 0.01,
+  "iforest_persistence_factor": 2.0,
+  "correlation_window_s": 120.0,
+  "expire_after_s": 600.0,
+  "update_event_min_interval_s": 60.0,
+  "confidence_bands": [
+   0.4,
+   0.7,
+   0.9
+  ],
+  "severity_bands": [
+   2,
+   3,
+   5,
+   7
+  ],
+  "process_context": true,
+  "enabled_detectors": [
+   "robust_z",
+   "quantile",
+   "ewma_shift",
+   "iforest"
+  ]
+ },
+ "synthetic": {
+  "scenarios": {
+   "A_sustained_cpu": {
+    "scenario": "A_sustained_cpu",
+    "data": "synthetic",
+    "description": "Normal CPU 10-30 %, then 80-90 % for 20 minutes",
+    "expected": "anomaly detected",
+    "baseline_status": {
+     "cpu": "STABLE",
+     "memory": "STABLE",
+     "temperature": "STABLE",
+     "disk_active": "STABLE",
+     "net_latency": "STABLE",
+     "gpu": "STABLE"
+    },
+    "model": "iforest-replay-device-v1",
+    "metrics": {
+     "anomalies_reported": 2,
+     "true_positives": 2,
+     "false_positives": 0,
+     "precision": 1.0,
+     "recall": 1.0,
+     "false_positives_per_hour": 0.0,
+     "alert_volume_per_day": 16.0,
+     "detection_latency_s": {
+      "cpu_80_90_20min": 220.0
+     },
+     "resolution_delay_s": [
+      230.0,
+      220.0
+     ],
+     "max_confidence_fp": null,
+     "levels": [
+      "HIGH"
+     ],
+     "correlated": [
+      "replay-device:compute:1760007640"
+     ],
+     "evaluations": 1069
+    },
+    "anomalies": [
+     {
+      "title": "Unusually high cpu usage",
+      "type": "behavioral_anomaly",
+      "level": "HIGH",
+      "confidence": 0.987,
+      "lifecycle": "RESOLVED",
+      "signal_id": "cpu",
+      "correlation_key": "replay-device:compute:1760007640",
+      "detected_after_s": 3820.0
+     },
+     {
+      "title": "Unusually high cpu-area temperature",
+      "type": "behavioral_anomaly",
+      "level": "HIGH",
+      "confidence": 0.987,
+      "lifecycle": "RESOLVED",
+      "signal_id": "temperature",
+      "correlation_key": "replay-device:compute:1760007640",
+      "detected_after_s": 3830.0
+     }
+    ],
+    "runtime_s": 5.7
+   },
+   "B_short_spike": {
+    "scenario": "B_short_spike",
+    "data": "synthetic",
+    "description": "CPU = 95 % for 2 seconds",
+    "expected": "no behavioral anomaly",
+    "baseline_status": {
+     "cpu": "STABLE",
+     "memory": "STABLE",
+     "temperature": "STABLE",
+     "disk_active": "STABLE",
+     "net_latency": "STABLE",
+     "gpu": "STABLE"
+    },
+    "model": "iforest-replay-device-v1",
+    "metrics": {
+     "anomalies_reported": 0,
+     "true_positives": 0,
+     "false_positives": 0,
+     "precision": 1.0,
+     "recall": null,
+     "false_positives_per_hour": 0.0,
+     "alert_volume_per_day": 0.0,
+     "detection_latency_s": {},
+     "resolution_delay_s": [],
+     "max_confidence_fp": null,
+     "levels": [],
+     "correlated": [],
+     "evaluations": 1069
+    },
+    "anomalies": [],
+    "runtime_s": 5.8
+   },
+   "C_thermal_correlation": {
+    "scenario": "C_thermal_correlation",
+    "data": "synthetic",
+    "description": "CPU and temperature rise together",
+    "expected": "correlated performance/thermal anomaly",
+    "baseline_status": {
+     "cpu": "STABLE",
+     "memory": "STABLE",
+     "temperature": "STABLE",
+     "disk_active": "STABLE",
+     "net_latency": "STABLE",
+     "gpu": "STABLE"
+    },
+    "model": "iforest-replay-device-v1",
+    "metrics": {
+     "anomalies_reported": 2,
+     "true_positives": 2,
+     "false_positives": 0,
+     "precision": 1.0,
+     "recall": 1.0,
+     "false_positives_per_hour": 0.0,
+     "alert_volume_per_day": 16.0,
+     "detection_latency_s": {
+      "cpu_and_temperature": 210.0
+     },
+     "resolution_delay_s": [
+      220.0,
+      210.0
+     ],
+     "max_confidence_fp": null,
+     "levels": [
+      "HIGH"
+     ],
+     "correlated": [
+      "replay-device:compute:1760007630"
+     ],
+     "evaluations": 1069
+    },
+    "anomalies": [
+     {
+      "title": "Unusually high cpu usage",
+      "type": "behavioral_anomaly",
+      "level": "HIGH",
+      "confidence": 0.987,
+      "lifecycle": "RESOLVED",
+      "signal_id": "cpu",
+      "correlation_key": "replay-device:compute:1760007630",
+      "detected_after_s": 3810.0
+     },
+     {
+      "title": "Unusually high cpu-area temperature",
+      "type": "behavioral_anomaly",
+      "level": "HIGH",
+      "confidence": 0.987,
+      "lifecycle": "RESOLVED",
+      "signal_id": "temperature",
+      "correlation_key": "replay-device:compute:1760007630",
+      "detected_after_s": 3830.0
+     }
+    ],
+    "runtime_s": 5.7
+   },
+   "D_new_device": {
+    "scenario": "D_new_device",
+    "data": "synthetic",
+    "description": "New device: no own history, normal but busier workload",
+    "expected": "cold start, no confident anomalies",
+    "baseline_status": {
+     "cpu": "COLD",
+     "memory": "COLD",
+     "temperature": "COLD",
+     "disk_active": "COLD",
+     "net_latency": "COLD",
+     "gpu": "COLD"
+    },
+    "model": null,
+    "metrics": {
+     "anomalies_reported": 0,
+     "true_positives": 0,
+     "false_positives": 0,
+     "precision": 1.0,
+     "recall": null,
+     "false_positives_per_hour": 0.0,
+     "alert_volume_per_day": 0.0,
+     "detection_latency_s": {},
+     "resolution_delay_s": [],
+     "max_confidence_fp": null,
+     "levels": [],
+     "correlated": [],
+     "evaluations": 1069
+    },
+    "anomalies": [],
+    "runtime_s": 0.4
+   },
+   "E_memory_leak": {
+    "scenario": "E_memory_leak",
+    "data": "synthetic",
+    "description": "Memory climbs 1 %/minute and stays high",
+    "expected": "anomaly detected (level shift)",
+    "baseline_status": {
+     "cpu": "STABLE",
+     "memory": "STABLE",
+     "temperature": "STABLE",
+     "disk_active": "STABLE",
+     "net_latency": "STABLE",
+     "gpu": "STABLE"
+    },
+    "model": "iforest-replay-device-v1",
+    "metrics": {
+     "anomalies_reported": 1,
+     "true_positives": 1,
+     "false_positives": 0,
+     "precision": 1.0,
+     "recall": 1.0,
+     "false_positives_per_hour": 0.0,
+     "alert_volume_per_day": 8.0,
+     "detection_latency_s": {
+      "memory_leak": 670.0
+     },
+     "resolution_delay_s": [],
+     "max_confidence_fp": null,
+     "levels": [
+      "HIGH"
+     ],
+     "correlated": [],
+     "evaluations": 1069
+    },
+    "anomalies": [
+     {
+      "title": "Unusually high memory usage",
+      "type": "behavioral_anomaly",
+      "level": "HIGH",
+      "confidence": 0.987,
+      "lifecycle": "ONGOING",
+      "signal_id": "memory",
+      "correlation_key": null,
+      "detected_after_s": 4270.0
+     }
+    ],
+    "runtime_s": 5.5
+   },
+   "F_erratic_cpu": {
+    "scenario": "F_erratic_cpu",
+    "data": "synthetic",
+    "description": "CPU alternates 10 % / 60 % every minute for 30 minutes",
+    "expected": "volatility anomaly",
+    "baseline_status": {
+     "cpu": "STABLE",
+     "memory": "STABLE",
+     "temperature": "STABLE",
+     "disk_active": "STABLE",
+     "net_latency": "STABLE",
+     "gpu": "STABLE"
+    },
+    "model": "iforest-replay-device-v1",
+    "metrics": {
+     "anomalies_reported": 4,
+     "true_positives": 4,
+     "false_positives": 0,
+     "precision": 1.0,
+     "recall": 1.0,
+     "false_positives_per_hour": 0.0,
+     "alert_volume_per_day": 32.0,
+     "detection_latency_s": {
+      "erratic_cpu": 420.0
+     },
+     "resolution_delay_s": [
+      240.0,
+      230.0,
+      600.0,
+      600.0
+     ],
+     "max_confidence_fp": null,
+     "levels": [
+      "HIGH"
+     ],
+     "correlated": [
+      "replay-device:compute:1760007710",
+      "replay-device:compute:1760008080"
+     ],
+     "evaluations": 1069
+    },
+    "anomalies": [
+     {
+      "title": "Unusually high cpu usage",
+      "type": "behavioral_anomaly",
+      "level": "HIGH",
+      "confidence": 0.853,
+      "lifecycle": "RESOLVED",
+      "signal_id": "cpu",
+      "correlation_key": "replay-device:compute:1760007710",
+      "detected_after_s": 4020.0
+     },
+     {
+      "title": "Unusual combination of signals",
+      "type": "multivariate_anomaly",
+      "level": "HIGH",
+      "confidence": 0.972,
+      "lifecycle": "RESOLVED",
+      "signal_id": null,
+      "correlation_key": "replay-device:compute:1760007710",
+      "detected_after_s": 4070.0
+     },
+     {
+      "title": "CPU-area temperature unusually unstable",
+      "type": "volatility_anomaly",
+      "level": "HIGH",
+      "confidence": 0.987,
+      "lifecycle": "RESOLVED",
+      "signal_id": "temperature",
+      "correlation_key": "replay-device:compute:1760008080",
+      "detected_after_s": 4260.0
+     },
+     {
+      "title": "CPU usage unusually unstable",
+      "type": "volatility_anomaly",
+      "level": "HIGH",
+      "confidence": 0.987,
+      "lifecycle": "RESOLVED",
+      "signal_id": "cpu",
+      "correlation_key": "replay-device:compute:1760008080",
+      "detected_after_s": 4320.0
+     }
+    ],
+    "runtime_s": 5.8
+   },
+   "G_unusual_combination": {
+    "scenario": "G_unusual_combination",
+    "data": "synthetic",
+    "description": "CPU busy (28 %) while temperature stays at idle level (45 C)",
+    "expected": "multivariate anomaly",
+    "baseline_status": {
+     "cpu": "STABLE",
+     "memory": "STABLE",
+     "temperature": "STABLE",
+     "disk_active": "STABLE",
+     "net_latency": "STABLE",
+     "gpu": "STABLE"
+    },
+    "model": "iforest-replay-device-v1",
+    "metrics": {
+     "anomalies_reported": 1,
+     "true_positives": 1,
+     "false_positives": 0,
+     "precision": 1.0,
+     "recall": 1.0,
+     "false_positives_per_hour": 0.0,
+     "alert_volume_per_day": 8.0,
+     "detection_latency_s": {
+      "cpu_temperature_mismatch": 390.0
+     },
+     "resolution_delay_s": [
+      230.0
+     ],
+     "max_confidence_fp": null,
+     "levels": [
+      "HIGH"
+     ],
+     "correlated": [],
+     "evaluations": 1069
+    },
+    "anomalies": [
+     {
+      "title": "Unusual combination of signals",
+      "type": "multivariate_anomaly",
+      "level": "HIGH",
+      "confidence": 0.987,
+      "lifecycle": "RESOLVED",
+      "signal_id": null,
+      "correlation_key": null,
+      "detected_after_s": 3990.0
+     }
+    ],
+    "runtime_s": 5.9
+   }
+  },
+  "normal_day": {
+   "data": "synthetic",
+   "anomalies_reported": 0,
+   "true_positives": 0,
+   "false_positives": 0,
+   "precision": 1.0,
+   "recall": null,
+   "false_positives_per_hour": 0.0,
+   "alert_volume_per_day": 0.0,
+   "detection_latency_s": {},
+   "resolution_delay_s": [],
+   "max_confidence_fp": null,
+   "levels": [],
+   "correlated": [],
+   "evaluations": 8629
+  },
+  "baseline_stability": {
+   "cpu": 0.305,
+   "memory": 0.39,
+   "temperature": 0.288,
+   "disk_active": 0.001,
+   "net_latency": 0.002,
+   "gpu": 0.001
+  },
+  "model_drift": {
+   "minutes": 1440,
+   "above_threshold": 0.0042,
+   "expected": 0.005
+  }
+ },
+ "device": {
+  "data": "recorded telemetry (read-only)",
+  "device_id": "ldt-70732d1beda54383",
+  "window": {
+   "start": "2026-10-07T10:44:20.010891+00:00",
+   "end": "2026-10-07T16:44:20.010891+00:00"
+  },
+  "series": {
+   "cpu": "cpu.usage_percent",
+   "memory": "memory.usage_percent",
+   "temperature": "thermal.zone_temperature_c{zone=_TZ.THM0}",
+   "disk_active": "disk.active_time_percent{disk=PhysicalDrive0}",
+   "net_latency": "network.gateway_latency_ms",
+   "gpu": "gpu.usage_percent{adapter=Intel(R) UHD Graphics,luid=0x00000000_0x0000F10E}"
+  },
+  "samples": {
+   "cpu": 2175,
+   "memory": 2173,
+   "temperature": 2143,
+   "disk_active": 2146,
+   "net_latency": 370,
+   "gpu": 2167
+  },
+  "baseline_status": {
+   "cpu": "DEVELOPING",
+   "memory": "DEVELOPING",
+   "temperature": "DEVELOPING",
+   "disk_active": "DEVELOPING",
+   "net_latency": "DEVELOPING",
+   "gpu": "DEVELOPING"
+  },
+  "baseline_minutes": {
+   "cpu": 627,
+   "memory": 628,
+   "temperature": 627,
+   "disk_active": 627,
+   "net_latency": 192,
+   "gpu": 627
+  },
+  "model": null,
+  "alert_volume_per_day": 16.0,
+  "anomalies": [
+   {
+    "title": "Unusually high gpu usage",
+    "type": "behavioral_anomaly",
+    "level": "MEDIUM",
+    "confidence": 0.827,
+    "started_at": "2026-10-07T11:40:20.010891+00:00",
+    "lifecycle": "RESOLVED"
+   },
+   {
+    "title": "Unusually high gpu usage",
+    "type": "behavioral_anomaly",
+    "level": "HIGH",
+    "confidence": 0.903,
+    "started_at": "2026-10-07T12:08:50.010891+00:00",
+    "lifecycle": "RESOLVED"
+   },
+   {
+    "title": "GPU usage unusually unstable",
+    "type": "volatility_anomaly",
+    "level": "LOW",
+    "confidence": 0.858,
+    "started_at": "2026-10-07T12:39:10.010891+00:00",
+    "lifecycle": "RESOLVED"
+   },
+   {
+    "title": "Unusually high drive activity",
+    "type": "behavioral_anomaly",
+    "level": "MEDIUM",
+    "confidence": 0.819,
+    "started_at": "2026-10-07T15:23:20.010891+00:00",
+    "lifecycle": "RESOLVED"
+   }
+  ],
+  "suppressed": 0
+ }
+}
